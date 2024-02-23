@@ -60,6 +60,7 @@ const dragDrop = (e) => {
     e.stopPropagation();
     const correctGo = draggedElement.firstChild.classList.contains(playerGo);
     const taken = e.target.classList.contains('piece');
+    const valid = checkIfValid(e.target);
     const opponentGo = playerGo === 'white' ? 'black' : 'white';
     const takenByOpponent = e.target.firstChild?.classList.contains(opponentGo);
    
@@ -72,17 +73,38 @@ const dragDrop = (e) => {
             return
         }
         // then check this
-        if (taken) {
+        if (taken && !takenByOpponent) {
             infoDisplay.textContent = ('You cannot go there');
             setTimeout(() => infoDisplay.textContent = "", 2000);
             return;
         }
+        if (valid) {
+            e.target.append(draggedElement);
+            changePlayer();
+            return;
+        }
     }
-   
-    //e.target.parentNode.append(draggedElement);
-    //e.target.remove()
-    //e.target.append(draggedElement);
-    changePlayer()
+}
+
+function checkIfValid(target) {
+    const targetId = Number(target.getAttribute('square-id')) || Number(target.parentNode.getAttribute('square-id'));
+    const startId = Number(startPositionId);
+    const piece = draggedElement.id;
+    console.log('target Id', targetId);
+    console.log('start Id', startId);
+    console.log('piece', piece);
+
+    switch(piece) {
+        case 'pawn' :
+            const starterRow = [8,9,10,11,12,13,14,15]
+            if (
+                starterRow.includes(startId) && startId + width * 2 === targetId ||
+                startId + width === targetId ||
+                startId + width - 1 === targetId &&  
+                ) {
+                    return true;
+                }
+    }
 }
 
 function changePlayer() {
