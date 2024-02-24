@@ -206,7 +206,6 @@ function checkIfValid(target) {
             }
             
             rookPath();
-            
             if ((startId + width * rowDifference) === targetId && upPath.every(i=>i)) {
                 return true;
                 } 
@@ -221,8 +220,43 @@ function checkIfValid(target) {
                 
                 else if (targetId >= (startId - 7) && targetId <= (startId - 1) && rightPath.every(i=>i) && Math.floor(startId / width) === Math.floor(targetId / width)) {
                     return true;
-                }  
+                } 
+            break; 
+        case 'queen':
+            bishopPath();
+            if ((startId + width * rowDifference + rowDifference) === targetId && diagonalPathForwardLeft.every(i=>i)) {
+                return true;
+                } 
+            
+                else if ((startId + width * (rowDifference + 1) - (rowDifference + 1)) === targetId && diagonalPathForwardRight.every(i=>i)) {
+                    return true;
+                }
 
+                else if ((startId - width * (rowDifference + 1) + (rowDifference + 1)) === targetId && diagonalPathBackwardLeft.every(i=>i)) {
+                    return true;
+                } 
+
+                else if ((startId - width * rowDifference - rowDifference) === targetId && diagonalPathBackwardRight.every(i=>i)) {
+                    return true;
+                }
+
+            rookPath();
+            if ((startId + width * rowDifference) === targetId && upPath.every(i=>i)) {
+                return true;
+                } 
+
+                else if ((startId - width * rowDifference) === targetId && downPath.every(i=>i)) {
+                    return true;
+                }
+                
+                else if (targetId <= (startId + 7) && targetId >= (startId + 1) && leftPath.every(i=>i) && Math.floor(startId / width) === Math.floor(targetId / width)) {
+                    return true;
+                }  
+                
+                else if (targetId >= (startId - 7) && targetId <= (startId - 1) && rightPath.every(i=>i) && Math.floor(startId / width) === Math.floor(targetId / width)) {
+                    return true;
+                } 
+            break;      
     }
 }
 
