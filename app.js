@@ -99,8 +99,8 @@ function checkIfValid(target) {
         case 'pawn' :
             const starterRow = [8,9,10,11,12,13,14,15]
             if (
-                starterRow.includes(startId) && startId + width * 2 === targetId ||
-                startId + width === targetId ||
+                starterRow.includes(startId) && startId + width * 2 === targetId && !document.querySelector(`[square-id="${startId + width * 2}"]`).firstChild ||
+                startId + width === targetId && !document.querySelector(`[square-id="${startId + width}"]`).firstChild ||
                 startId + width - 1 === targetId && document.querySelector(`[square-id="${startId + width - 1}"]`).firstChild ||
                 startId + width + 1 === targetId && document.querySelector(`[square-id="${startId + width + 1}"]`).firstChild
                 ) {
@@ -141,10 +141,9 @@ function checkIfValid(target) {
 
                 diagonalPathBackwardLeft = [];
                 
-                for (let i =0; i<rowDifference-1; i++) {
+                for (let i =0; i<rowDifference; i++) {
                     if (startId - width * (i+1) + (i+1) >=0 && startId - width * (i+1) + (i+1) <=63) {
                         diagonalPathBackwardLeft.push(!document.querySelector(`[square-id="${startId - width * (i+1) + (i+1)}"]`).firstChild);
-                        Math.floor((Math.abs(targetId-startId))/width)
                     }
                 }
 
@@ -224,6 +223,7 @@ function checkIfValid(target) {
             break; 
         case 'queen':
             bishopPath();
+            rookPath();
             if ((startId + width * rowDifference + rowDifference) === targetId && diagonalPathForwardLeft.every(i=>i)) {
                 return true;
                 } 
@@ -240,9 +240,8 @@ function checkIfValid(target) {
                     return true;
                 }
 
-            rookPath();
-            if ((startId + width * rowDifference) === targetId && upPath.every(i=>i)) {
-                return true;
+                else if ((startId + width * rowDifference) === targetId && upPath.every(i=>i)) {
+                    return true;
                 } 
 
                 else if ((startId - width * rowDifference) === targetId && downPath.every(i=>i)) {
@@ -256,7 +255,20 @@ function checkIfValid(target) {
                 else if (targetId >= (startId - 7) && targetId <= (startId - 1) && rightPath.every(i=>i) && Math.floor(startId / width) === Math.floor(targetId / width)) {
                     return true;
                 } 
-            break;      
+            break;  
+            case 'king': 
+            if (
+                startId + 1 === targetId ||
+                startId - 1 === targetId ||
+                startId + width === targetId ||
+                startId - width === targetId ||
+                startId + width + 1 === targetId ||
+                startId + width - 1 === targetId ||
+                startId - width + 1 === targetId ||
+                startId - width - 1 === targetId 
+            ) {
+                return true;
+            }
     }
 }
 
