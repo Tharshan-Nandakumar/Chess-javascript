@@ -90,6 +90,7 @@ function checkIfValid(target) {
     const targetId = Number(target.getAttribute('square-id')) || Number(target.parentNode.getAttribute('square-id'));
     const startId = Number(startPositionId);
     const piece = draggedElement.id;
+    let rowDifference = Math.floor((Math.abs(targetId-startId))/width);
     console.log('target Id', targetId);
     console.log('start Id', startId);
     console.log('piece', piece);
@@ -105,7 +106,7 @@ function checkIfValid(target) {
                 ) {
                     return true;
                 }
-                break;
+            break;
         case 'knight' :
             if (
                 startId + width * 2 + 1 === targetId ||
@@ -116,15 +117,112 @@ function checkIfValid(target) {
                 startId - width * 2 - 1 === targetId ||
                 startId - width + 2 === targetId ||
                 startId - width - 2 === targetId 
-            ) {
+                ) {
                 return true;
-            }
+                }
             break;
         case 'bishop' :
-            if (
-                startId + width + 1 === targetId ||
-                startId + width * 2 + 2 && !document.querySelector(`[square-id="${startId + width + 1}"]`).firstChild
-            )
+            
+            function bishopPath() {
+
+                diagonalPathForwardLeft = [];
+                for (let i =0; i<rowDifference-1; i++) {
+                    if (startId + width * (i+1) + (i+1) >=0 && startId + width * (i+1) + (i+1) <=63) {
+                        diagonalPathForwardLeft.push(!document.querySelector(`[square-id="${startId + width * (i+1) + (i+1)}"]`).firstChild);
+                    }
+                }
+
+                diagonalPathForwardRight = [];
+                for (let i =0; i<rowDifference; i++) {
+                    if (startId + width * (i+1) - (i+1) >=0 && startId + width * (i+1) - (i+1) <=63) {
+                        diagonalPathForwardRight.push(!document.querySelector(`[square-id="${startId + width * (i+1) - (i+1)}"]`).firstChild);
+                    }
+                }
+
+                diagonalPathBackwardLeft = [];
+                
+                for (let i =0; i<rowDifference-1; i++) {
+                    if (startId - width * (i+1) + (i+1) >=0 && startId - width * (i+1) + (i+1) <=63) {
+                        diagonalPathBackwardLeft.push(!document.querySelector(`[square-id="${startId - width * (i+1) + (i+1)}"]`).firstChild);
+                        Math.floor((Math.abs(targetId-startId))/width)
+                    }
+                }
+
+                diagonalPathBackwardRight = [];
+                for (let i =0; i<rowDifference-1; i++) {
+                    if (startId - width * (i+1) - (i+1) >=0 && startId - width * (i+1) - (i+1) <=63) {
+                        diagonalPathBackwardRight.push(!document.querySelector(`[square-id="${startId - width * (i+1) - (i+1)}"]`).firstChild);
+                    }
+                }
+                
+                return diagonalPathForwardRight, diagonalPathForwardLeft, diagonalPathBackwardLeft, diagonalPathBackwardRight
+                
+            }
+            bishopPath();
+            if ((startId + width * rowDifference + rowDifference) === targetId && diagonalPathForwardLeft.every(i=>i)) {
+                return true;
+                } 
+            
+                else if ((startId + width * (rowDifference + 1) - (rowDifference + 1)) === targetId && diagonalPathForwardRight.every(i=>i)) {
+                    return true;
+                }
+
+                else if ((startId - width * (rowDifference + 1) + (rowDifference + 1)) === targetId && diagonalPathBackwardLeft.every(i=>i)) {
+                    return true;
+                } 
+
+                else if ((startId - width * rowDifference - rowDifference) === targetId && diagonalPathBackwardRight.every(i=>i)) {
+                    return true;
+                }
+            break;
+        case 'rook' :
+            
+            function rookPath() {
+                upPath = [];
+                for (let i =0; i<rowDifference - 1; i++) {
+                    if (startId + width * (i + 1) >=0 && startId + width * (i + 1) <=63) {
+                        upPath.push(!document.querySelector(`[square-id="${startId + width * (i + 1)}"]`).firstChild);
+                    }
+                }
+
+                downPath = [];
+                for (let i =0; i<rowDifference - 1; i++) {
+                    if (startId - width * (i + 1) >=0 && startId - width * (i + 1) <=63) {
+                        downPath.push(!document.querySelector(`[square-id="${startId - width * (i + 1)}"]`).firstChild);
+                    }
+                }
+                
+                leftPath = [];
+                for (let i =0; i<(targetId - startId)-1; i++) {
+                    leftPath.push(!document.querySelector(`[square-id="${startId + i + 1}"]`).firstChild);
+                }
+
+                rightPath = [];
+                for (let i =0; i<(startId - targetId)-1; i++) {
+                    rightPath.push(!document.querySelector(`[square-id="${startId - (i + 1)}"]`).firstChild);
+                }
+                
+                return upPath, downPath, leftPath, rightPath;
+            }
+            
+            rookPath();
+            
+            if ((startId + width * rowDifference) === targetId && upPath.every(i=>i)) {
+                return true;
+                } 
+
+                else if ((startId - width * rowDifference) === targetId && downPath.every(i=>i)) {
+                    return true;
+                }
+                
+                else if (targetId <= (startId + 7) && targetId >= (startId + 1) && leftPath.every(i=>i) && Math.floor(startId / width) === Math.floor(targetId / width)) {
+                    return true;
+                }  
+                
+                else if (targetId >= (startId - 7) && targetId <= (startId - 1) && rightPath.every(i=>i) && Math.floor(startId / width) === Math.floor(targetId / width)) {
+                    return true;
+                }  
+
     }
 }
 
