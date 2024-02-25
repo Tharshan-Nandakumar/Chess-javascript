@@ -3,6 +3,8 @@
     height: 320px;
     display:flex;
     flex-wrap:wrap;
+    margin: auto;
+    margin-top:200px;
 }
 
 .square {
@@ -17,6 +19,10 @@
     margin:5px;
     position:relative;
     z-index: -5;
+}
+
+.square:hover {
+    background-color:rgb(195, 195, 51)
 }
 
 path {
