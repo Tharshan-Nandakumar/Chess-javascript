@@ -322,4 +322,3 @@ allSquares.forEach((square)=>{
     square.addEventListener('dragover', dragOver);
     square.addEventListener('drop', dragDrop);
 })
-
