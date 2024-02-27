@@ -51,6 +51,18 @@ let draggedElement
 const dragStart = (e) => {
     startPositionId = e.target.parentNode.getAttribute('square-id'); //when a piece is dragged, its starting square Id is saved
     draggedElement = e.target;
+    function showAvailableMoves(){
+        const allSquares = document.querySelectorAll('.square');
+        const correctGo = draggedElement.firstChild.classList.contains(playerGo);
+        if (correctGo) {
+            allSquares.forEach(square => {
+                if (checkIfValid(square) && !square.firstChild?.firstChild.classList.contains(playerGo)) {
+                    square.classList.add('available');
+                  } 
+                });
+        }
+    }
+    showAvailableMoves()
 }
 
 const dragOver = (e) => {
@@ -64,7 +76,12 @@ const dragDrop = (e) => {
     const valid = checkIfValid(e.target);
     const opponentGo = playerGo === 'white' ? 'black' : 'white';
     const takenByOpponent = e.target.firstChild?.classList.contains(opponentGo);
-   
+
+    allSquares.forEach(square => {
+        if (checkIfValid(square)) {
+            square.classList.remove('available');
+          } 
+        });
     if (correctGo) {
         // must check if legal move and if taking opponent piece first 
         if (takenByOpponent && valid) {
@@ -110,20 +127,26 @@ function checkIfValid(target) {
                 ) {
                     return true;
                 }
+            else {
+                return false;
+            }
             break;
         case 'knight' :
             if (
-                startId + width * 2 + 1 === targetId || //possible kinght moves
-                startId + width * 2 - 1 === targetId ||
-                startId + width + 2 === targetId ||
-                startId + width - 2 === targetId ||
+                startId % width !== width - 1 && startId + width * 2 + 1 === targetId || //possible kinght moves
+                startId % width !== width + 1 && startId + width * 2 - 1 === targetId ||
+                startId % width !== width - 1 && startId + width + 2 === targetId ||
+                startId % width !== width + 2 && startId + width - 2 === targetId ||
                 startId - width * 2 + 1 === targetId ||
                 startId - width * 2 - 1 === targetId ||
-                startId - width + 2 === targetId ||
+                startId % width !== width - 1 && startId - width + 2 === targetId ||
                 startId - width - 2 === targetId 
                 ) {
                 return true;
                 }
+            else {
+                return false;
+            }
             break;
         case 'bishop' :
             
@@ -177,6 +200,9 @@ function checkIfValid(target) {
                 else if ((startId - width * rowDifference - rowDifference) === targetId && diagonalPathBackwardRight.every(i=>i)) {
                     return true;
                 }
+            else {
+                return false;
+            }
             break;
         case 'rook' :
             
@@ -224,6 +250,9 @@ function checkIfValid(target) {
                 else if (targetId >= (startId - 7) && targetId <= (startId - 1) && rightPath.every(i=>i) && Math.floor(startId / width) === Math.floor(targetId / width)) {
                     return true;
                 } 
+            else {
+                return false;
+            }
             break; 
         case 'queen':
             bishopPath(); //combing bishop and rook moves
@@ -259,6 +288,9 @@ function checkIfValid(target) {
                 else if (targetId >= (startId - 7) && targetId <= (startId - 1) && rightPath.every(i=>i) && Math.floor(startId / width) === Math.floor(targetId / width)) {
                     return true;
                 } 
+            else {
+                return false;
+            }
             break;  
             case 'king': //valid king moves
             if (
@@ -272,6 +304,9 @@ function checkIfValid(target) {
                 startId - width - 1 === targetId 
             ) {
                 return true;
+            }
+            else {
+                return false;
             }
     }
 }
@@ -322,4 +357,3 @@ allSquares.forEach((square)=>{
     square.addEventListener('dragover', dragOver);
     square.addEventListener('drop', dragDrop);
 })
-
