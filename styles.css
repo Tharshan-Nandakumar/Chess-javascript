@@ -22,7 +22,7 @@
 }
 
 .square:hover {
-    background-color:rgb(195, 195, 51)
+    background-color:rgb(195, 195, 52)
 }
 
 path {
@@ -49,4 +49,8 @@ path {
 
 .white {
     fill: rgb(255, 255, 255);
+}
+
+.available {
+    background-color:rgba(195, 195, 51, 0.5)
 }
