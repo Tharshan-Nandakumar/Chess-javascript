@@ -122,8 +122,8 @@ function checkIfValid(target) {
             if (
                 starterRow.includes(startId) && startId + width * 2 === targetId && !document.querySelector(`[square-id="${startId + width * 2}"]`).firstChild || //starting pawns can move two space forward if no other piece in the way
                 startId + width === targetId && !document.querySelector(`[square-id="${startId + width}"]`).firstChild || //pawn can move one forward if no piece in way
-                startId + width - 1 === targetId && document.querySelector(`[square-id="${startId + width - 1}"]`).firstChild || //pawn can take opponent piece diagonally
-                startId + width + 1 === targetId && document.querySelector(`[square-id="${startId + width + 1}"]`).firstChild
+                startId + width - 1 === targetId && document.querySelector(`[square-id="${startId + width - 1}"]`).firstChild && targetId%width < startId%width || //pawn can take opponent piece diagonally
+                startId + width + 1 === targetId && document.querySelector(`[square-id="${startId + width + 1}"]`).firstChild && targetId%width > startId%width
                 ) {
                     return true;
                 }
@@ -196,19 +196,19 @@ function checkIfValid(target) {
                 
             }
             bishopPath();
-            if ((startId + width * rowDifference + rowDifference) === targetId && diagonalPathForwardLeft.every(i=>i)) { //if every square in path is free, then move is allowed
+            if ((startId + width * rowDifference + rowDifference) === targetId && diagonalPathForwardLeft.every(i=>i) && startId%width < targetId%width) { //if every square in path is free, then move is allowed
                 return true;
                 } 
             
-                else if ((startId + width * (rowDifference + 1) - (rowDifference + 1)) === targetId && diagonalPathForwardRight.every(i=>i)) {
+                else if ((startId + width * (rowDifference + 1) - (rowDifference + 1)) === targetId && diagonalPathForwardRight.every(i=>i) && startId%width > targetId%width) {
                     return true;
                 }
 
-                else if ((startId - width * (rowDifference + 1) + (rowDifference + 1)) === targetId && diagonalPathBackwardLeft.every(i=>i)) {
+                else if ((startId - width * (rowDifference + 1) + (rowDifference + 1)) === targetId && diagonalPathBackwardLeft.every(i=>i) && startId%width < targetId%width) {
                     return true;
                 } 
 
-                else if ((startId - width * rowDifference - rowDifference) === targetId && diagonalPathBackwardRight.every(i=>i)) {
+                else if ((startId - width * rowDifference - rowDifference) === targetId && diagonalPathBackwardRight.every(i=>i) && startId%width > targetId%width) {
                     return true;
                 }
             else {
@@ -268,19 +268,19 @@ function checkIfValid(target) {
         case 'queen':
             bishopPath(); //combing bishop and rook moves
             rookPath();
-            if ((startId + width * rowDifference + rowDifference) === targetId && diagonalPathForwardLeft.every(i=>i)) {
+            if ((startId + width * rowDifference + rowDifference) === targetId && diagonalPathForwardLeft.every(i=>i) && startId%width < targetId%width) {
                 return true;
                 } 
             
-                else if ((startId + width * (rowDifference + 1) - (rowDifference + 1)) === targetId && diagonalPathForwardRight.every(i=>i)) {
+                else if ((startId + width * (rowDifference + 1) - (rowDifference + 1)) === targetId && diagonalPathForwardRight.every(i=>i) && startId%width > targetId%width) {
                     return true;
                 }
 
-                else if ((startId - width * (rowDifference + 1) + (rowDifference + 1)) === targetId && diagonalPathBackwardLeft.every(i=>i)) {
+                else if ((startId - width * (rowDifference + 1) + (rowDifference + 1)) === targetId && diagonalPathBackwardLeft.every(i=>i) && startId%width < targetId%width) {
                     return true;
                 } 
 
-                else if ((startId - width * rowDifference - rowDifference) === targetId && diagonalPathBackwardRight.every(i=>i)) {
+                else if ((startId - width * rowDifference - rowDifference) === targetId && diagonalPathBackwardRight.every(i=>i) && startId%width > targetId%width) {
                     return true;
                 }
 
