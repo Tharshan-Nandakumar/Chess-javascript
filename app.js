@@ -133,11 +133,22 @@ function checkIfValid(target) {
             break;
         case 'knight' :
             if (
+                startId % width === width - 2 && startId + width + 2 === targetId ||
+                startId % width === width - 2 && startId - width + 2 === targetId ||
+                startId % width === width - 7 && startId + width - 2 === targetId ||
+                startId % width === width - 7 && startId - width - 2 === targetId ||
+                startId % width === 0 && startId + width - 2 === targetId ||
+                startId % width === 0 && startId + width * 2 - 1 === targetId
+               ) {
+                return false;
+               } 
+            
+            if (
                 startId % width !== width - 1 && startId + width * 2 + 1 === targetId || //possible kinght moves
                 startId % width !== width + 1 && startId + width * 2 - 1 === targetId ||
                 startId % width !== width - 1 && startId + width + 2 === targetId ||
                 startId % width !== width + 2 && startId + width - 2 === targetId ||
-                startId - width * 2 + 1 === targetId ||
+                startId % width !== width - 1 && startId - width * 2 + 1 === targetId ||
                 startId - width * 2 - 1 === targetId ||
                 startId % width !== width - 1 && startId - width + 2 === targetId ||
                 startId - width - 2 === targetId 
