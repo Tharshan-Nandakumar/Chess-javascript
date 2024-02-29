@@ -45,24 +45,34 @@ const createBoard = () => {
 
 createBoard()
 
+
 let startPositionId 
 let draggedElement
 
 const dragStart = (e) => {
     startPositionId = e.target.parentNode.getAttribute('square-id'); //when a piece is dragged, its starting square Id is saved
     draggedElement = e.target;
-    function showAvailableMoves(){
+    function showAvailableMoves(){ //when you start dragging a piece, its available moves will be shown
         const allSquares = document.querySelectorAll('.square');
         const correctGo = draggedElement.firstChild.classList.contains(playerGo);
         if (correctGo) {
             allSquares.forEach(square => {
-                if (checkIfValid(square) && !square.firstChild?.firstChild.classList.contains(playerGo)) {
-                    square.classList.add('available');
+                if (checkIfValid(square) && !square.firstChild?.firstChild.classList.contains(playerGo)) {//if the move is valid and does not land on a piece of the same colour
+                    square.classList.add('available');//the available class adds a yellow border to indicate available moves
                   } 
                 });
         }
     }
     showAvailableMoves()
+
+    /*const kings = Array.from(document.querySelectorAll('#king'))
+    
+    console.log(kings.some(king => king.parentNode.classList.contains('available')))
+    function check() {
+        opponentPieces = Array.from(document.getElementsByClassName(playerGo));
+        opponentPieces.forEach(piece => checkifValid(piece.parentNode.parentNode.classList))
+    }
+    check();*/
 }
 
 const dragOver = (e) => {
@@ -70,7 +80,7 @@ const dragOver = (e) => {
 }
 
 const dragDrop = (e) => {
-    e.stopPropagation();
+    e.stopPropagation(); //stops parent elements from receiving event
     const correctGo = draggedElement.firstChild.classList.contains(playerGo);
     const taken = e.target.classList.contains('piece');
     const valid = checkIfValid(e.target);
@@ -79,7 +89,7 @@ const dragDrop = (e) => {
 
     allSquares.forEach(square => {
         if (checkIfValid(square)) {
-            square.classList.remove('available');
+            square.classList.remove('available'); // removes highlighted available moves when piece is dropped
           } 
         });
     if (correctGo) {
@@ -107,14 +117,12 @@ const dragDrop = (e) => {
     }
 }
 
+//going through different types of pieces and what their allowed moves are
 function checkIfValid(target) {
     const targetId = Number(target.getAttribute('square-id')) || Number(target.parentNode.getAttribute('square-id'));
     const startId = Number(startPositionId);
     const piece = draggedElement.id;
     let rowDifference = Math.floor((Math.abs(targetId-startId))/width);
-    console.log('target Id', targetId);
-    console.log('start Id', startId);
-    console.log('piece', piece); 
 
     switch(piece) {
         case 'pawn' :
@@ -123,7 +131,7 @@ function checkIfValid(target) {
                 starterRow.includes(startId) && startId + width * 2 === targetId && !document.querySelector(`[square-id="${startId + width * 2}"]`).firstChild || //starting pawns can move two space forward if no other piece in the way
                 startId + width === targetId && !document.querySelector(`[square-id="${startId + width}"]`).firstChild || //pawn can move one forward if no piece in way
                 startId + width - 1 === targetId && document.querySelector(`[square-id="${startId + width - 1}"]`).firstChild && targetId%width < startId%width || //pawn can take opponent piece diagonally
-                startId + width + 1 === targetId && document.querySelector(`[square-id="${startId + width + 1}"]`).firstChild && targetId%width > startId%width
+                startId + width + 1 === targetId && document.querySelector(`[square-id="${startId + width + 1}"]`).firstChild && targetId%width > startId%width //final condition makes sure pawn cannot take piece diagonally on other side of the board
                 ) {
                     return true;
                 }
@@ -132,6 +140,7 @@ function checkIfValid(target) {
             }
             break;
         case 'knight' :
+            // removing incorrect available moves involving when knight is at edge of board, jumping to other side of the board
             if (
                 startId % width === width - 2 && startId + width + 2 === targetId ||
                 startId % width === width - 2 && startId - width + 2 === targetId ||
@@ -142,9 +151,9 @@ function checkIfValid(target) {
                ) {
                 return false;
                } 
-            
+            //possible kinght moves
             if (
-                startId % width !== width - 1 && startId + width * 2 + 1 === targetId || //possible kinght moves
+                startId % width !== width - 1 && startId + width * 2 + 1 === targetId || 
                 startId % width !== width + 1 && startId + width * 2 - 1 === targetId ||
                 startId % width !== width - 1 && startId + width + 2 === targetId ||
                 startId % width !== width + 2 && startId + width - 2 === targetId ||
@@ -162,10 +171,10 @@ function checkIfValid(target) {
         case 'bishop' :
             
             function bishopPath() {
-
+                //going through all four diagonal directions and checking if any pieces blocking path
                 diagonalPathForwardLeft = [];
                 for (let i =0; i<rowDifference-1; i++) {
-                    if (startId + width * (i+1) + (i+1) >=0 && startId + width * (i+1) + (i+1) <=63) {
+                    if (startId + width * (i+1) + (i+1) >=0 && startId + width * (i+1) + (i+1) <=63) { //ensuring possible moves on board, prevent error when for loops run in all four diagonal directions
                         diagonalPathForwardLeft.push(!document.querySelector(`[square-id="${startId + width * (i+1) + (i+1)}"]`).firstChild);
                     }
                 }
@@ -196,7 +205,8 @@ function checkIfValid(target) {
                 
             }
             bishopPath();
-            if ((startId + width * rowDifference + rowDifference) === targetId && diagonalPathForwardLeft.every(i=>i) && startId%width < targetId%width) { //if every square in path is free, then move is allowed
+            //if every square in diagonal path is free, then move is allowed
+            if ((startId + width * rowDifference + rowDifference) === targetId && diagonalPathForwardLeft.every(i=>i) && startId%width < targetId%width) { //final condition prevents available moves continuing to other side of board incorrectly
                 return true;
                 } 
             
@@ -218,6 +228,7 @@ function checkIfValid(target) {
         case 'rook' :
             
             function rookPath() {
+            //going through all four vertical/horizontal directions and checking if any pieces blocking path
                 upPath = [];
                 for (let i =0; i<rowDifference - 1; i++) {
                     if (startId + width * (i + 1) >=0 && startId + width * (i + 1) <=63) {
@@ -246,7 +257,8 @@ function checkIfValid(target) {
             }
             
             rookPath();
-            if ((startId + width * rowDifference) === targetId && upPath.every(i=>i)) { //if path is free then move is allowed
+            //if every square in vertical/horizontal path is free, then move is allowed
+            if ((startId + width * rowDifference) === targetId && upPath.every(i=>i)) { 
                 return true;
                 } 
 
@@ -266,7 +278,7 @@ function checkIfValid(target) {
             }
             break; 
         case 'queen':
-            bishopPath(); //combing bishop and rook moves
+            bishopPath(); //combining bishop and rook moves
             rookPath();
             if ((startId + width * rowDifference + rowDifference) === targetId && diagonalPathForwardLeft.every(i=>i) && startId%width < targetId%width) {
                 return true;
@@ -303,7 +315,8 @@ function checkIfValid(target) {
                 return false;
             }
             break;  
-            case 'king': //valid king moves
+            case 'king': 
+            //valid king moves
             if (
                 startId + 1 === targetId ||
                 startId - 1 === targetId ||
@@ -322,7 +335,8 @@ function checkIfValid(target) {
     }
 }
 
-function changePlayer() { //switching Ids of squares every turn so that square Ids always start from 0 on current player's side
+//switching Ids of squares every turn so that square Ids always start from 0 on current player's side
+function changePlayer() { 
     if (playerGo === "black") {
         reverseIds();
         playerGo = "white";
@@ -345,13 +359,13 @@ function revertIds() {
     allSquares.forEach((square, i) => square.setAttribute('square-id',i))
 }
 
-
+//game is won when king is taken
 function checkForWin() {
     const kings = Array.from(document.querySelectorAll('#king'))
     if (!kings.some(king => king.firstChild.classList.contains('white'))) {
         infoDisplay.innerHTML = "Black Player Wins";
         const allSquares = document.querySelectorAll('.square');
-        allSquares.forEach(square => square.firstChild?.setAttribute('draggable', false))
+        allSquares.forEach(square => square.firstChild?.setAttribute('draggable', false)) //once game is won, cannot drag pieces anymore
     }
 
     if (!kings.some(king => king.firstChild.classList.contains('black'))) {
@@ -361,8 +375,8 @@ function checkForWin() {
     }
 }
 
-const allSquares = document.querySelectorAll(".square"); //allowing dragging and dropping of pieces
-
+//allowing dragging and dropping of pieces
+const allSquares = document.querySelectorAll(".square"); 
 allSquares.forEach((square)=>{
     square.addEventListener('dragstart', dragStart);
     square.addEventListener('dragover', dragOver);
